@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend-laravel
+      dockerfile: Dockerfile
+    container_name: news-orchestrator-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend-laravel:/var/www/html
+    networks:
+      - news-network
+    depends_on:
+      - db
+    environment:
+      - APP_NAME=NewsOrchestrator
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=false
+      - APP_URL=${APP_URL}
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - LOG_CHANNEL=stack
+      - CACHE_DRIVER=file
+      - QUEUE_CONNECTION=sync
+      - SESSION_DRIVER=file
+
+  db:
+    image: mysql:8.0
+    container_name: news-orchestrator-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - news-network
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
+
+networks:
+  news-network:
+    driver: bridge

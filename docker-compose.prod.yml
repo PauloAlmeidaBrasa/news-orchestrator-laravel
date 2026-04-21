@@ -1,0 +1,18 @@
+version: '3.8'
+
+include:
+  - docker-compose.base.yml
+
+services:
+  app:
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - CACHE_DRIVER=file
+      - QUEUE_CONNECTION=sync
+    # No ports exposed in production
+    # No volumes for code in production
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  db:
+    # No ports exposed in production
